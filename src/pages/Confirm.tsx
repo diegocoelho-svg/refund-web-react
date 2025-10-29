@@ -15,7 +15,7 @@ export function Confirm() {
       <img src={okSvg} alt="icone de OK" className="w-28" />
 
       <p className="text-sm text-gray-200 text-center">
-        Agora é apenas aguardar! Sua solicitação será analisada e, em breve, o setor financeiro entrará em contato com você
+        Agora é só aguardar! Sua solicitação será analisada e, em breve, o setor financeiro entrará em contato com você.
       </p>
 
       <a href="/" className="w-full p-3 text-center bg-green-100 rounded-lg text-white hover:bg-green-200 transition ease-linear">Nova solicitação</a>
