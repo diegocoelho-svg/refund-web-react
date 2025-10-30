@@ -1,4 +1,7 @@
-import { useState } from "react"
+// import { useState } from "react"
+
+import { useActionState } from "react"
+
 import { z, ZodError } from "zod"
 import { AxiosError } from "axios"
 import { useNavigate } from "react-router"
@@ -9,7 +12,7 @@ import { Input } from "../components/Input"
 import { Button } from "../components/Button"
 
 const signUpSchema = z.object({
-  name: z.string().trim().min(1, { message: "Informe o nome" }),
+  name: z.string().trim().min(2, { message: "Informe o nome corretamente!" }),
   email: z.email({ message: "E-mail inválido" }),
   password: z.string().min(6, { message: "Senha deve ter pelo menos 6 dígitos." }),
   passwordConfirm: z.string({ message: "Confirme a senha" }),
@@ -19,25 +22,21 @@ const signUpSchema = z.object({
 })
 
 export function SignUp() {
-  const [name, setName] = useState("")
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [passwordConfirm, setPasswordConfirm] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-
+  // const [name, setName] = useState("")
+  // const [email, setEmail] = useState("")
+  // const [password, setPassword] = useState("")
+  // const [passwordConfirm, setPasswordConfirm] = useState("")
+  // const [isLoading, setIsLoading] = useState(false)
   const navigate = useNavigate()
+  const [state, formAction, isLoading] = useActionState(signUp, null)
 
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault()
-
+  async function signUp(_prevState: any, formData: FormData) {
     try {
-      setIsLoading(true)
-
       const data = signUpSchema.parse({
-        name,
-        email,
-        password,
-        passwordConfirm
+        name: formData.get("name"),
+        email: formData.get("email"),
+        password: formData.get("password"),
+        passwordConfirm: formData.get("passwordConfirm")
       })
 
       await api.post("/users", data)
@@ -50,51 +49,55 @@ export function SignUp() {
       console.log(error)
 
       if (error instanceof AxiosError) {
-        return alert(error.response?.data.message)
+        return { message: error.response?.data.message }
       }
 
       if (error instanceof ZodError) {
-        return alert(error.issues[0].message)
+        return { message: error.issues[0].message }
       }
-    } finally {
-      setIsLoading(false)
+
+      return { message: "Erro ao cadastrar" }
     }
   }
 
   return (
-    <form onSubmit={onSubmit} className="w-full flex flex-col gap-4">
+    <form action={formAction} className="w-full flex flex-col gap-4">
 
       <Input
+        name="name"
         required
         legend="nome"
         type="text"
         placeholder="Digite seu nome"
-        onChange={(e) => setName(e.target.value)}
       />
 
       <Input
+        name="email"
         required
         legend="E-mail"
         type="email"
         placeholder="seu@email.com"
-        onChange={(e) => setEmail(e.target.value)}
       />
 
       <Input
+        name="password"
         required
         legend="Senha"
         type="password"
-        placeholder="123456"
-        onChange={(e) => setPassword(e.target.value)}
+        placeholder="Digite sua senha"
       />
 
       <Input
+        name="passwordConfirm"
         required
         legend="Confirme a Senha"
         type="password"
-        placeholder="123456"
-        onChange={(e) => setPasswordConfirm(e.target.value)}
+        placeholder="Digite sua senha"
       />
+
+      <p className="text-[11px] text-red-500 mt-1 text-left">
+        {state?.message}
+      </p>
 
       <Button type="submit" isLoading={isLoading}>Cadastrar</Button>
 

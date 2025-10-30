@@ -63,7 +63,7 @@ export function SignIn() {
       // defaultValue={String(state?.password)}
       />
 
-      <p className="text-sm text-red-600 text-center my-4 font-medium">
+      <p className="text-[11px] text-red-500 mt-1 text-left">
         {state?.message}
       </p>
 
